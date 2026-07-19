@@ -1,65 +1,48 @@
 import streamlit as st
-import requests
+import os
 
-st.set_page_config(page_title="Çok Amaçlı Hesaplayıcı", layout="centered")
+st.set_page_config(page_title="Calculators & Audio Tools", layout="centered")
 
-st.title("🎛️ Calculators & Tools")
+st.title("🚀 Calculators & Audio Tools")
+st.write("Welcome! Choose the tool you want to use from the menu below.")
 
-# Menü Seçimi (Sorun çıkaran ses kısmını temizledik, diğerleri tıkır tıkır çalışacak)
-menu = st.sidebar.selectbox(
-    "Bir Araç Seçin:",
-    ["BMI Hesaplayıcı", "Yüzde Hesaplayıcı", "Döviz Çevirici"]
-)
+# Sadece bizi yormayacak aktif modüller kaldı
+menu = st.sidebar.selectbox("Select a Tool", [
+    "MP4 to MP3 Converter", 
+    "BMI Calculator", 
+    "Percentage Calculator"
+])
 
-# 1. BMI HESAPLAYICI
-if menu == "BMI Hesaplayıcı":
-    st.header("⚖️ BMI (Vücut Kitle İndeksi) Hesaplayıcı")
-    kilo = st.number_input("Kilonuz (kg):", min_value=1.0, max_value=300.0, value=70.0)
-    boy_cm = st.number_input("Boyunuz (cm):", min_value=50.0, max_value=250.0, value=170.0)
+# 1. MP4 TO MP3 CONVERTER
+if menu == "MP4 to MP3 Converter":
+    st.subheader("🎵 MP4 to MP3 Video Converter")
+    st.write("Extract audio from your MP4 videos instantly.")
     
-    if st.button("Hesapla"):
-        boy_m = boy_cm / 100
-        bmi = kilo / (boy_m ** 2)
-        st.subheader(f"BMI Değeriniz: {bmi:.2f}")
-        
-        if bmi < 18.5:
-            st.warning("Zayıf kategorisindesiniz.")
-        elif 18.5 <= bmi < 25:
-            st.success("Normal kilolu kategorisindesiniz.")
-        elif 25 <= bmi < 30:
-            st.warning("Fazla kilolu kategorisindesiniz.")
-        else:
-            st.error("Obez kategorisindesiniz.")
-
-# 2. YÜZDE HESAPLAYICI
-elif menu == "Yüzde Hesaplayıcı":
-    st.header("📊 Yüzde Hesaplayıcı")
-    sayi = st.number_input("Sayıyı girin:", value=100.0)
-    yuzde = st.number_input("Yüzde oranını girin (%):", value=20.0)
+    uploaded_file = st.file_uploader("Upload your MP4 video file", type=["mp4"])
     
-    if st.button("Hesapla"):
-        sonuc = (sayi * yuzde) / 100
-        st.success(f"{sayi} sayısının %{yuzde}'si = {sonuc}")
+    if uploaded_file is not None:
+        st.success("File uploaded successfully! Ready to convert.")
 
-# 3. DÖVİZ ÇEVİRİCİ
-elif menu == "Döviz Çevirici":
-    st.header("💱 Döviz Çevirici (Canlı Kurlar)")
-    miktar = st.number_input("Çevrilecek Miktar:", min_value=0.0, value=1.0)
-    kaynak_doviz = st.selectbox("Kaynak Para Birimi:", ["USD", "EUR", "TRY", "GBP"])
-    hedef_doviz = st.selectbox("Hedef Para Birimi:", ["TRY", "USD", "EUR", "GBP"])
+# 2. BMI CALCULATOR
+elif menu == "BMI Calculator":
+    st.subheader("🏋️ Body Mass Index (BMI)")
+    weight = st.number_input("Weight (kg)", min_value=1.0, max_value=300.0, value=70.0)
+    height = st.number_input("Height (cm)", min_value=50.0, max_value=250.0, value=170.0)
     
-    if st.button("Çevir"):
-        with st.spinner("Canlı kurlar alınıyor..."):
-            try:
-                url = f"https://er-api.com{kaynak_doviz}"
-                response = requests.get(url).json()
-                if response["result"] == "success":
-                    kur = response["rates"][hedef_doviz]
-                    toplam = miktar * kur
-                    st.success(f"{miktar} {kaynak_doviz} = {toplam:.2f} {hedef_doviz}")
-                    st.caption(f"Güncel Kur: 1 {kaynak_doviz} = {kur:.4f} {hedef_doviz}")
-                else:
-                    st.error("Döviz kurları alınamadı.")
-            except:
-                st.error("İnternet bağlantısı kurulamadı.")
+    if st.button("Calculate BMI"):
+        height_m = height / 100
+        bmi = weight / (height_m ** 2)
+        st.metric(label="Your BMI Index", value=f"{bmi:.2f}")
+        if bmi < 18.5: st.warning("Underweight")
+        elif 18.5 <= bmi < 25: st.success("Normal Weight")
+        else: st.error("Overweight / Obese")
 
+# 3. PERCENTAGE CALCULATOR
+elif menu == "Percentage Calculator":
+    st.subheader("📊 Percentage Calculator")
+    num = st.number_input("Main Number", value=100.0)
+    percentage = st.number_input("Percentage (%)", value=20.0)
+    
+    if st.button("Calculate"):
+        result = (num * percentage) / 100
+        st.success(f"{percentage}% of {num} is: **{result:.2f}**")
