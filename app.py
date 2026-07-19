@@ -56,4 +56,3 @@ elif menu == "Percentage Calculator":
     
     st.markdown("---")
     st.success(f"Result: **{percentage}%** of **{num}** is exactly = **{result:.2f}**")
-
